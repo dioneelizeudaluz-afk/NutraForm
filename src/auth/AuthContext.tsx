@@ -7,7 +7,7 @@ import {
   type ReactNode
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { requireSupabase } from "../lib/supabase";
+import { supabase, supabaseConfigError, requireSupabase } from "../lib/supabase";
 import type { Database } from "../types/database";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -42,8 +42,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const loadProfile = useCallback(async (userId: string) => {
     setProfileLoading(true);
     try {
-      const supabase = requireSupabase();
-      const { data, error } = await supabase
+      const client = requireSupabase();
+      const { data, error } = await client
         .from("profiles")
         .select("*")
         .eq("user_id", userId)
@@ -70,7 +70,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [user, loadProfile]);
 
   useEffect(() => {
-    const supabase = requireSupabase();
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     let active = true;
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -107,15 +111,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [loadProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const supabase = requireSupabase();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const client = requireSupabase();
+    const { error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
   }, []);
 
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {
-      const supabase = requireSupabase();
-      const { error } = await supabase.auth.signUp({
+      const client = requireSupabase();
+      const { error } = await client.auth.signUp({
         email,
         password,
         options: {
@@ -128,21 +132,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   const signOut = useCallback(async () => {
-    const supabase = requireSupabase();
-    const { error } = await supabase.auth.signOut();
+    const client = requireSupabase();
+    const { error } = await client.auth.signOut();
     if (error) throw new Error(error.message);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    const supabase = requireSupabase();
+    const client = requireSupabase();
     const redirectTo = `${window.location.origin}/reset-password`;
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) throw new Error(error.message);
   }, []);
 
   const updatePassword = useCallback(async (newPassword: string) => {
-    const supabase = requireSupabase();
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    const client = requireSupabase();
+    const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw new Error(error.message);
   }, []);
 
@@ -174,6 +178,58 @@ export function AuthProvider({ children }: AuthProviderProps) {
       refreshProfile
     ]
   );
+
+  if (supabaseConfigError) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px",
+          background: "#FBFBF8",
+          color: "#1B2B24",
+          fontFamily: "Inter, system-ui, sans-serif",
+          textAlign: "center"
+        }}
+      >
+        <div style={{ maxWidth: "560px" }}>
+          <h1 style={{ fontSize: "22px", marginBottom: "12px" }}>
+            Supabase nao configurado
+          </h1>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "#5A6B63" }}>
+            A aplicacao nao consegue ligar-se ao Supabase porque faltam as
+            variaveis de ambiente. Verifica na Vercel:
+          </p>
+          <ul
+            style={{
+              textAlign: "left",
+              marginTop: "16px",
+              padding: "16px",
+              background: "#ffffff",
+              border: "1px solid #E4E8E3",
+              borderRadius: "12px",
+              fontSize: "13px",
+              lineHeight: 1.8
+            }}
+          >
+            <li>
+              Vai a Vercel, projecto NutraForm, Settings, Environment Variables
+            </li>
+            <li>
+              Adiciona <code>VITE_SUPABASE_URL</code> com o URL do projecto Supabase
+            </li>
+            <li>
+              Adiciona <code>VITE_SUPABASE_ANON_KEY</code> com a chave anon public
+            </li>
+            <li>Marca Production, Preview e Development</li>
+            <li>Faz Redeploy do projecto</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

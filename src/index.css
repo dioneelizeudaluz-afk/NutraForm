@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #FBFBF8;
+  color: #1B2B24;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #D8F3DC;
+  color: #1B2B24;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FBFBF8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9CFC9;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #74C69D;
+}
+
+@layer components {
+  .card-nf {
+    @apply rounded-2xl border border-nf-line bg-white shadow-soft;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-nf-green/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-nf-green text-white hover:bg-nf-green/90;
+  }
+
+  .btn-ghost {
+    @apply btn border border-nf-line bg-transparent text-nf-ink hover:border-nf-green/40 hover:text-nf-green;
+  }
+
+  .btn-soft {
+    @apply btn bg-nf-greenPale text-nf-green hover:bg-nf-greenPale/80;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-nf-line bg-white px-4 py-3 text-sm text-nf-ink outline-none transition-colors focus:border-nf-green;
+  }
+
+  .field-label {
+    @apply mb-2 block text-xs font-medium text-nf-gray;
+  }
+}

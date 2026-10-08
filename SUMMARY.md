@@ -1,7 +1,5 @@
 # SUMMARY — NutraForm
 
-Documento para continuidade por outra sessao de IA.
-
 ## 1. Visao geral
 
 Plataforma SaaS/health-tech de rotina e habitos saudaveis. Modelo freemium.
@@ -11,48 +9,42 @@ Plataforma SaaS/health-tech de rotina e habitos saudaveis. Modelo freemium.
 - React + TypeScript + Vite
 - Tailwind CSS v3
 - React Router v6
-- Supabase (FASE 2+)
+- Supabase (auth, DB, storage)
 
 ## 3. Estado
 
-- FASE 1 concluida:
-  - `package.json`, `vite.config.ts`, `tsconfig.json`
-  - `tailwind.config.js`, `postcss.config.js`
-  - `index.html`, `public/favicon.svg`, `public/og-image.svg`
-  - `vercel.json`
-  - `.env.example`, `.gitignore`
-  - `src/main.tsx`, `src/App.tsx`, `src/index.css`, `src/vite-env.d.ts`
-  - `src/lib/constants.ts`
-  - `src/types/index.ts`
-  - `src/components/ui/Container.tsx`, `Button.tsx`, `Card.tsx`, `Logo.tsx`
-  - `src/components/ProtectedRoute.tsx` (placeholder, AUTH_ENABLED=false)
-  - `src/layouts/PublicLayout.tsx`, `AuthLayout.tsx`
-  - `src/pages/Landing.tsx`, `NotFound.tsx`
-  - `src/pages/auth/Login.tsx`, `Register.tsx`, `ForgotPassword.tsx`, `DashboardPlaceholder.tsx`
-  - `src/routes/AppRoutes.tsx`
+- FASE 1 concluida.
+- FASE 2 concluida:
+  - `@supabase/supabase-js` instalado.
+  - `src/lib/supabase.ts` (cliente tipado, robusto contra env vars em falta).
+  - `src/types/database.ts` (tipos de todas as 18 tabelas + funcao `is_admin`).
+  - Migrations: `0001_core_tables.sql`, `0002_tables_main.sql`, `0003_tables_logs.sql`, `0004_tables_content.sql`, `0005_tables_analysis.sql`, `0006_tables_system.sql`, `0007_rls_policies.sql`, `0008_storage_buckets.sql`.
+  - 18 tabelas com RLS activo:
+    - profiles, goals, user_preferences, daily_routines, routine_tasks, habit_logs, water_logs, weight_logs, sleep_logs
+    - recipes, recipe_favorites, workout_logs
+    - food_logs, food_analysis, ai_conversations
+    - notifications, subscriptions, admin_users
+  - Funcao `is_admin()` (SECURITY DEFINER, `search_path = public`).
+  - Buckets: `meal-photos` (privado, pasta por user), `avatars` (leitura publica, escrita na pasta do user), `recipe-images` (leitura publica, escrita admin).
 
-## 4. Decisoes tecnicas
+## 4. Modelo de admin
 
-- Tailwind v3 (nao v4).
-- Sem aliases de import. Sem `@types/node`.
-- Sem `tsconfig.node.json`. Build: `vite build`.
-- `vercel.json` incluido para SPA routing funcionar desde a FASE 1.
-- Sem Supabase nesta fase (nao ha imports).
-- Design system: `nf-green`, `nf-greenSoft`, `nf-greenPale`, `nf-cream`, `nf-beige`, `nf-ink`, `nf-gray`, `nf-line`.
-- Fontes: Inter (sans) + Fraunces (display).
+- Fonte de verdade: `profiles.role` (`user` ou `admin`).
+- `admin_users` e tabela de **log/auditoria** (nao fonte de verdade).
 
-## 5. Rotas existentes
+## 5. Decisoes tecnicas
 
-- `/` — Landing
-- `/login`, `/register`, `/forgot-password` — Auth (placeholders)
-- `/dashboard` — Protegida (placeholder)
-- `*` — 404
+- `supabase.ts` nao lanca na importacao; expoe `supabaseConfigError` e `requireSupabase()`.
+- Enums text com check constraints (facilita evolucao).
+- Timestamps `timestamptz` em todas as tabelas.
+- Triggers `updated_at` nas tabelas que possuem essa coluna.
+- Trigger `handle_new_user` cria `profiles` ao registar.
+- RLS: cada user so ve os seus dados; recipes sao publicas se `published = true`.
 
 ## 6. Fases seguintes
 
-- FASE 2: Supabase, tipos, migrations (profiles, goals, daily_routines, routine_tasks, habit_logs, food_logs, food_analysis, recipes, recipe_favorites, water_logs, weight_logs, workout_logs, sleep_logs, notifications, user_preferences, ai_conversations, subscriptions, admin_users), RLS, Storage.
-- FASE 3: Auth.
-- FASE 4: Onboarding.
+- FASE 3: Auth (login, register, forgot, reset, useAuth, ProtectedRoute, AdminRoute).
+- FASE 4: Onboarding multi-etapas.
 - FASE 5: Dashboard + Rotina diaria.
 - FASE 6: Habitos, Hidratacao, Sono.
 - FASE 7: Peso, Progresso.

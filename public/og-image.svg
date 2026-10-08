@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FBFBF8"/>
+  <circle cx="1050" cy="120" r="220" fill="#D8F3DC" opacity="0.5"/>
+  <circle cx="150" cy="520" r="180" fill="#74C69D" opacity="0.25"/>
+  <text x="100" y="300" font-family="Georgia, serif" font-size="90" font-weight="600" fill="#1B2B24">NutraForm</text>
+  <text x="100" y="380" font-family="Helvetica, sans-serif" font-size="34" fill="#5A6B63">Transforme sua rotina. Transforme seu corpo.</text>
+</svg>

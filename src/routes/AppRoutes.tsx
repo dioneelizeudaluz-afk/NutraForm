@@ -7,8 +7,7 @@ import NotFound from "../pages/NotFound";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
-import ResetPassword from "../pages/auth/ResetPassword";
-import DashboardHome from "../pages/auth/DashboardHome";
+import DashboardPlaceholder from "../pages/auth/DashboardPlaceholder";
 
 export default function AppRoutes() {
   return (
@@ -22,11 +21,10 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardHome />} />
+        <Route path="/dashboard" element={<DashboardPlaceholder />} />
       </Route>
     </Routes>
   );

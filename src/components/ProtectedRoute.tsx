@@ -1,16 +1,14 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../auth/useAuth";
-import LoadingScreen from "./LoadingScreen";
+
+// Placeholder de protecao. A logica real sera implementada numa proxima fase.
+const AUTH_ENABLED = false;
 
 export default function ProtectedRoute() {
-  const { loading, session } = useAuth();
   const location = useLocation();
 
-  if (loading) return <LoadingScreen label="A verificar sessao..." />;
-
-  if (!session) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (!AUTH_ENABLED) {
+    return <Outlet />;
   }
 
-  return <Outlet />;
+  return <Navigate to="/login" replace state={{ from: location.pathname }} />;
 }
